@@ -11,7 +11,9 @@ const {
 router
   .route("/register")
   .post(validateUser, handleValidationErrors, usersController.register);
+
 router.route("/login").post(usersController.login);
 
-router.post('/:id/upload', usersController.uploadImage);
+router.post('/:id/upload', usersController.upload.single("image"), usersController.handleUpload);
+
 module.exports = router;

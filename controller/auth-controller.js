@@ -5,39 +5,45 @@ const multer = require('multer');
 const path = require('path');
 
 
+// Storage configuration for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads');
+    cb(null, path.join(__dirname, "../images"));
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); 
+    cb(null, new Date().toISOString().replace(/:/g, "-") + path.extname(file.originalname));
   }
 });
 
+// Multer upload middleware
 const upload = multer({ storage: storage });
-const uploadImage = upload.single('profileImage');
-const handleUpload = async(req, res, next)=> {
+
+// Handle image upload
+const handleUpload = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const userId = req.params.userId;
-
-    const user = await User.findById(userId); 
+    const userId = req.params.id;
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.profileImage = req.file.path;
+    // Generate a URL to access the image
+    const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+
+    user.profileImage = imageUrl;
     await user.save();
 
-    res.status(200).json({ message: 'Image uploaded successfully' });
+    res.status(200).json({ message: 'Image uploaded successfully', imageUrl });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });
   }
-}
+};
+
 
 const register = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -90,6 +96,6 @@ const login = async (req, res, next) => {
 module.exports = {
   register,
   login,
-  uploadImage,
+  upload,
   handleUpload,
 };

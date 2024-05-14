@@ -5,9 +5,9 @@ const { validateStock , handleValidationErrors } = require('../middleware/stockV
 
 router.route('/')
             .get(stockController.getAllStocks)
-            .post(validateStock,handleValidationErrors,stockController.addStock)
-router.route('/:id')
+router.route('/:id/:projid')
             .get(stockController.getStocks)
             .patch(stockController.updateStock)
             .delete(stockController.deleteStock)
+            .post(validateStock,handleValidationErrors,stockController.addStock)
 module.exports = router;

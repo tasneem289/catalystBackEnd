@@ -3,6 +3,10 @@ const app = express();
 const db = require("./db.js");
 const cors = require("cors");
 const compression = require("compression");
+const path = require('path');
+
+//app.use(express.static(path.join(__direname,"images")));
+app.use('/images',express.static(path.join(__dirname,'images')));
 app.use(cors());
 app.use(express.json());
 app.use(compression());

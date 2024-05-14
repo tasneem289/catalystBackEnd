@@ -2,6 +2,21 @@ const {validationResult} = require('express-validator');
 const Project = require('../model/project');
 const appError = require('../utility/appError');
 const project = require('../model/project');
+const multer = require('multer');
+const path = require('path');
+
+// Storage configuration for multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../images"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString().replace(/:/g, "-") + path.extname(file.originalname));
+  }
+});
+
+// Multer upload middleware
+const upload = multer({ storage: storage });
 
 const getAllProjects = async (req,res,next) => {
   try{
@@ -29,22 +44,31 @@ const getProject = async (req, res, next) => {
 
 const addProject = async (req, res, next) => {
   try {
-      /*
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-          const error = appError.create(errors.array(), 400, "Validation Error");
-          return next(error);
-      }
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    
+    const { info, size, budget, publishingTime, user, stocks } = req.body;
 
-      */
-      const newProject = new Project(req.body);
-      await newProject.save();
-      res.status(201).json({ status: "SUCCESS", data: { project: newProject } });
+    const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+    const newProject = new Project({
+      info,
+      size,
+      budget,
+      publishingTime,
+      projectImage: imageUrl,
+      user,
+      stocks
+    });
+
+    await newProject.save();
+    res.status(201).json({ status: "SUCCESS", data: { project: newProject } });
   } catch (error) {
-      const customError = appError.create(error.message, 500, "Internal Server Error");
-      return next(customError);
+    const customError = appError.create(error.message, 500, "Internal Server Error");
+    return next(customError);
   }
 }
+
 
 const updateProject = async (req, res, next) => {
   try {
@@ -72,5 +96,6 @@ module.exports = {
        updateProject,
        getAllProjects,
        getProject,
-       deleteProject
+       deleteProject,
+       upload
 }

@@ -1,5 +1,6 @@
 const Stock = require("../model/stock");
 const appError = require("../utility/appError");
+const User = require('../model/auth')
 
 const getAllStocks = async (req, res) => {
   try {
@@ -26,7 +27,13 @@ const addStock = async (req, res) => {
       amount,
       price,
     });
-    await newStock.save();
+    await newStock.save(); 
+    const userId = req.params.id;
+    const projid =req.params.projid
+    const user = await User.findById(userId);
+    user.stocks.push(newStock._id);
+    user.projects.push(projid);
+    await user.save();
     res
       .status(201)
       .json({ message: "Stock added successfully", stock: newStock });
