@@ -17,14 +17,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
-  stocks: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Stock",
-    },
-  ],
-
   projects: [
     {
       type: mongoose.Schema.Types.ObjectId,

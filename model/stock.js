@@ -4,10 +4,12 @@ const stockSchema =new mongoose.Schema({
         type: Number,
         required:true
     },
-    price: { 
-        type: Number,
-        required:true,
-    },
+    projects: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Project",
+        },
+      ],
 
 });
 

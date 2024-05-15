@@ -13,9 +13,11 @@ app.use(compression());
 const projectRouter = require("./router/project-router.js");
 const usersRouter = require("./router/auth-router.js");
 const stockRouter = require("./router/stock-router.js");
+const investRouter=require("./router/investment-router.js");
 app.use("/api/projects", projectRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/stocks", stockRouter);
+app.use("/api/investments",investRouter);
 
 app.all("*", (req, res, next) => {
   return res
